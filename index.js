@@ -1,11 +1,12 @@
 const express = require("express");
-const app = express();
 const path = require("path");
 const { authenticate } = require("@google-cloud/local-auth");
 const { google } = require("googleapis");
 
 const port = 9090;
-// these are the scope that we want to access 
+const app = express();
+
+//the scopes that we want to access 
 const SCOPES = [
   "https://www.googleapis.com/auth/gmail.readonly",
   "https://www.googleapis.com/auth/gmail.send",
@@ -13,13 +14,13 @@ const SCOPES = [
   "https://mail.google.com/",
 ];
 
-// i kept the label name
+// label name
 const labelName = "Auto-Responded";
 
 
 app.get("/", async (req, res) => {
 
-  // here i am taking google GMAIL  authentication 
+  //Google GMAIL  authentication 
   const auth = await authenticate({
     keyfilePath: path.join(__dirname, "credentials.json"),
     scopes: SCOPES,
@@ -27,12 +28,12 @@ app.get("/", async (req, res) => {
 
   console.log("this is auth",auth)
 
-  // here i getting authorize gmail id
+  //Finding authorized gmail id
   const gmail = google.gmail({ version: "v1", auth });
 
 
-  //  this function is finding all email that have unreplied or unseen
-  async function getUnrepliedMessages(auth) {
+  //getting all unread and unreplied emails
+  async function getUnrepliedEmails(auth) {
     const gmail = google.gmail({ version: "v1", auth });
     const response = await gmail.users.messages.list({
       userId: "me",
@@ -43,7 +44,7 @@ app.get("/", async (req, res) => {
     return response.data.messages || [];
   }
 
-  //  this function generating the label ID
+  //to get a label id
   async function createLabel(auth) {
     const gmail = google.gmail({ version: "v1", auth });
     try {
@@ -72,32 +73,32 @@ app.get("/", async (req, res) => {
   }
 
   async function main() {
-    // Create a label for theApp
+    // create label
     const labelId = await createLabel(auth);
-    console.log('Label  ${labelId}');
-    // Repeat  in Random intervals
-    setInterval(async () => {
-      //Get messages that have no prior reply
-      const messages = await getUnrepliedMessages(auth);
-      // console.log("Unreply messages", messages);
 
-      //  Here i am checking is there any gmail that did not get reply
-      if (messages && messages.length > 0) {
-        for (const message of messages) {
-          const messageData = await gmail.users.messages.get({
+    // Repeat in Random intervals
+    setInterval(async () => {
+      //Get unreplied and new emails
+      const emails = await getUnrepliedEmails(auth);
+
+      //checking that is there any gmail that did not get reply
+      if (emails && emails.length > 0) {
+        for (const email of emails) {
+          const emailData = await gmail.users.messages.get({
             auth,
             userId: "me",
-            id: message.id,
+            id: email.id,
           });
 
-          const email = messageData.data;
+          const email = emailData.data;
           const hasReplied = email.payload.headers.some(
             (header) => header.name === "In-Reply-To"
           );
 
           if (!hasReplied) {
-            // Craft the reply message
-            const replyMessage = {
+
+            // compose the reply message
+            const replyEmail = {
               userId: "me",
               resource: {
                 raw: Buffer.from(
@@ -113,15 +114,15 @@ app.get("/", async (req, res) => {
                     }\r\n` +
                     `Content-Type: text/plain; charset="UTF-8"\r\n` +
                     `Content-Transfer-Encoding: 7bit\r\n\r\n` +
-                    `I cannot see your email right now as I'm currently on vacation and will reply to you when I return.\r\n`
+                    `I cannot see your email right now as I'm currently on vacation and will reply to you when I return.\nRegards,\nAbhilash Agnihotri\r\n`
                 ).toString("base64"),
               },
             };
 
-            await gmail.users.messages.send(replyMessage);
+            await gmail.users.messages.send(replyEmail);
 
-            // Add label and move the email
-            await gmail.users.messages.modify({
+            //Add label to the email so that it can move to its respective label
+            gmail.users.messages.modify({
               auth,
               userId: "me",
               id: message.id,
@@ -136,10 +137,7 @@ app.get("/", async (req, res) => {
     }, Math.floor(Math.random() * (120 - 45 + 1) + 45) * 1000);
   }
 
-
-  
   main();
-  // const labels = response.data.labels;
   res.json({ "this is Auth": auth });
 });
 
