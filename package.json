@@ -1,0 +1,21 @@
+{
+  "name": "listed-assignment",
+  "version": "1.0.0",
+  "description": "This is a Vaction Auto-Reply project which auto reply to new emails and checks for new emails every 45-120 seconds.This web app is built using node.js and uses gmail api and cloud auth apis for authentication",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "author": "Abhilash Agnihotri",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/local-auth": "^2.1.1",
+    "express": "^4.18.2",
+    "google-auth-library": "^8.9.0",
+    "googleapis": "^122.0.0",
+    "node-cron": "^3.0.2",
+    "nodemon": "^3.0.1",
+    "path": "^0.12.7"
+  }
+}
