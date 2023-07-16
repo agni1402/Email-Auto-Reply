@@ -1,6 +1,21 @@
 # Email-Auto-Reply
 A Node.js app that automatically responds to emails during vacations. It uses the Gmail API to check for new emails, sends replies to emails without prior responses, and adds labels to organize the emails. Built with modern JavaScript standards and Google APIs.
-# Just run the app and ENJOY YOUR HOLIDAYS!🚀🎉
+# Just run this app and ENJOY YOUR HOLIDAYS!🚀🎉
+# Note
+You need to download the credentials.json file from the Google Cloud console to run this app. To download the credentials.json file for your project, you'll need to follow these steps:
+
+1. Go to the Google Cloud Console.
+2. Select your project or create a new one if needed.
+3. In the left navigation menu, click on "APIs & Services" -> "Credentials".
+4. On the "Credentials" page, click on the "Create credentials" button and select "Service account".
+5. Fill in the required information for the service account, such as name and description.
+6. Choose the role for the service account (e.g., Project Owner, Editor, or Gmail API access).
+7. Under "Key type", select "JSON" and click on the "Create" button.
+The JSON file containing your credentials will be downloaded to your local machine.
+Make sure to place the downloaded credentials.json file in the same directory as your Node.js application, or specify the correct file path when authenticating.
+
+![Screenshot 2023-07-16 130843](https://github.com/agni1402/Email-Auto-Reply/assets/115021170/9a1311eb-2a95-4f10-87f6-4226a2a2ab16)
+
 # Description and Areas of Improvement
 Detailed Spec: Libraries and Technologies Used
 
